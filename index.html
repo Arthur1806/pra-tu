@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2a0610">
 <title>Pra você ❤️</title>
 <!-- Sem og:image de propósito: a prévia do link no WhatsApp/iMessage NÃO pode entregar a surpresa. -->
@@ -39,6 +39,10 @@
 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
+/* anti-bugs de clique rápido: sem zoom por toque duplo, sem seleção de texto, sem menu "Copiar" */
+*{touch-action:manipulation}
+html{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+img{-webkit-user-drag:none;user-drag:none}
 body{
   font-family:var(--f-poster);
   color:var(--creme);
@@ -89,6 +93,7 @@ button:focus-visible{outline:2px solid var(--terracota-2);outline-offset:5px}
   display:flex;flex-direction:column;align-items:center;
   overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom));
+  overscroll-behavior:contain;
   visibility:hidden;opacity:0;pointer-events:none;transition:opacity .35s ease}
 .screen.active{visibility:visible;opacity:1;pointer-events:auto}
 
@@ -114,7 +119,13 @@ button:focus-visible{outline:2px solid var(--terracota-2);outline-offset:5px}
 
 /* =================== TELA 1: só o botão =================== */
 #intro{justify-content:center}
-.intro-stage{position:relative;display:grid;place-items:center;width:100%;flex:1}
+.intro-stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;width:100%;flex:1}
+.sound-note{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;pointer-events:none}
+.sound-note .main{display:block;max-width:300px;line-height:1.5;font-weight:500;letter-spacing:2px;text-transform:uppercase;font-size:clamp(13px,3.8vw,15px);color:var(--creme)}
+.sound-note .ico{display:block;width:max-content;margin:0 auto 6px;font-size:24px;animation:beat 1.6s ease-in-out infinite}
+.sound-note small{font-family:var(--f-drama);font-style:italic;font-size:14px;color:var(--terracota-2);letter-spacing:.3px}
+.sound-note::before{content:"";width:60px;height:1px;background:rgba(224,137,92,.55);margin-bottom:10px}
+#intro.leaving .sound-note{transition:opacity .4s;opacity:0}
 .spotlight{position:absolute;left:50%;top:50%;width:min(140vw,900px);height:min(110vh,900px);transform:translate(-50%,-56%);pointer-events:none;
   background:radial-gradient(ellipse 34% 40% at 50% 58%,rgba(245,230,211,.16),transparent 70%),
              conic-gradient(from 160deg at 50% 0%,transparent 0deg,rgba(245,230,211,.07) 14deg,rgba(245,230,211,.07) 26deg,transparent 40deg);
@@ -128,12 +139,11 @@ button:focus-visible{outline:2px solid var(--terracota-2);outline-offset:5px}
 .ch-inner{position:relative;width:min(100%,460px);flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;min-height:min-content}
 .ch-title{font-family:var(--f-drama);font-style:italic;font-weight:900;font-size:clamp(27px,7.6vw,40px);line-height:1.12;color:var(--creme);
   text-shadow:0 0 18px rgba(227,36,43,.75),0 3px 0 var(--bordo);margin-top:6px;padding:0 44px}
-.ch-sub{font-family:var(--f-drama);font-style:italic;font-weight:400;font-size:clamp(17px,4.8vw,21px);line-height:1.25;color:var(--terracota-2);max-width:360px}
 .plaque{font-family:var(--f-poster);font-weight:400;letter-spacing:1.2px;text-transform:uppercase;font-size:clamp(13px,3.7vw,15px);line-height:1.35;
   padding:8px 16px;border-top:1px solid rgba(224,137,92,.55);border-bottom:1px solid rgba(224,137,92,.55);color:var(--creme);max-width:360px;
   background:linear-gradient(90deg,transparent,rgba(26,3,8,.55) 15%,rgba(26,3,8,.55) 85%,transparent)}
 .plaque b{color:var(--rojo-vivo);font-weight:600;text-shadow:0 0 10px rgba(227,36,43,.6)}
-.bubble-slot{position:relative;z-index:6;min-height:64px;width:100%;display:flex;align-items:center;justify-content:center;margin-top:6px}
+.bubble-slot{position:relative;z-index:6;pointer-events:none;min-height:64px;width:100%;display:flex;align-items:center;justify-content:center;margin-top:6px}
 .bubble{position:relative;max-width:340px;font-family:var(--f-drama);font-style:italic;font-weight:600;font-size:clamp(19px,5.4vw,23px);line-height:1.2;color:var(--creme);
   background:rgba(20,2,7,.88);border:1.5px solid var(--rojo-vivo);border-radius:14px;padding:10px 18px;
   box-shadow:0 0 26px rgba(227,36,43,.4),0 10px 20px rgba(0,0,0,.4);
@@ -165,10 +175,10 @@ button:focus-visible{outline:2px solid var(--terracota-2);outline-offset:5px}
   white-space:nowrap;animation:hint 1.2s ease-in-out infinite;pointer-events:none;transition:opacity .3s}
 @keyframes hint{50%{transform:translate(-50%,-5px);opacity:.6}}
 .tap-hint.hide{opacity:0;visibility:hidden;animation:none}
-.whisper{position:relative;z-index:6;min-height:26px;font-family:var(--f-drama);font-style:italic;font-size:19px;color:var(--creme);opacity:0;transition:opacity .5s;padding:0 46px}
+.whisper{position:relative;z-index:6;pointer-events:none;min-height:26px;font-family:var(--f-drama);font-style:italic;font-size:19px;color:var(--creme);opacity:0;transition:opacity .5s;padding:0 46px}
 #challenge.waiting .whisper{opacity:.85;animation:breathe 2.4s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.4}}
-.progress-box{position:relative;z-index:6;width:min(100%,340px);margin-bottom:4px}
+.progress-box{position:relative;z-index:6;pointer-events:none;width:min(100%,340px);margin-bottom:4px}
 .counter{display:inline-block;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;font-size:clamp(20px,5.8vw,26px);color:var(--creme);
   background:linear-gradient(180deg,var(--rojo-vivo),#8e0b21);padding:5px 20px;border-radius:999px;border:1.5px solid var(--terracota-2);
   box-shadow:0 8px 18px rgba(0,0,0,.45);margin-bottom:12px}
@@ -335,7 +345,6 @@ body[data-screen="challenge"] #musicBtn, body[data-screen="reveal"] #musicBtn{di
   :root{--heart:clamp(110px, min(40vw, 23vh), 200px)}
   .ch-inner{gap:5px}
   .ch-title{font-size:24px}
-  .ch-sub{font-size:16px}
   .plaque{padding:5px 12px;font-size:12px}
   .bubble-slot{min-height:50px;margin-top:2px}
   .bubble{font-size:18px;padding:7px 14px}
@@ -354,6 +363,7 @@ body[data-screen="challenge"] #musicBtn, body[data-screen="reveal"] #musicBtn{di
   <div class="intro-stage">
     <div class="spotlight" aria-hidden="true"></div>
     <button id="startBtn" class="big-btn">CLIQUE AQUI, CURIOSA! 🌹</button>
+    <p class="sound-note"><span class="main"><span class="ico">🔊</span>Ligue o som para uma melhor experiência</span><small>no iPhone, tire do modo silencioso</small></p>
   </div>
 </section>
 
@@ -362,7 +372,6 @@ body[data-screen="challenge"] #musicBtn, body[data-screen="reveal"] #musicBtn{di
   <div class="ch-inner" id="chInner">
     <button class="seal fade-finale" id="seal" aria-label="selo secreto">🌹</button>
     <h2 class="ch-title fade-finale">Tenho uma surpresa pra você...</h2>
-    <p class="ch-sub fade-finale">Mas primeiro você precisa demonstrar um pouquinho de interesse. 🤭</p>
     <p class="plaque fade-finale">Clique no coração <b>15 vezes</b> para desbloquear seu presente!</p>
 
     <div class="bubble-slot"><div id="bubble" class="bubble" role="status" aria-live="polite"></div></div>
@@ -421,7 +430,7 @@ body[data-screen="challenge"] #musicBtn, body[data-screen="reveal"] #musicBtn{di
     <div class="frame-wrap">
       <figure class="frame clicky" id="frame">
         <div class="photo-box" id="photoBox">
-          <img id="photo" alt="Seu galã mexicano: de sombrero, traje de mariachi e uma rosa vermelha entre os dentes" decoding="async">
+          <img id="photo" draggable="false" alt="Seu galã mexicano: de sombrero, traje de mariachi e uma rosa vermelha entre os dentes" decoding="async">
           <div class="photo-missing">Coloque a foto “minha-foto.jpg” na pasta do site</div>
         </div>
         <figcaption>el galán — edição limitada</figcaption>
@@ -435,7 +444,7 @@ body[data-screen="challenge"] #musicBtn, body[data-screen="reveal"] #musicBtn{di
     </div>
 
     <p class="final-msg" id="finalMsg">Não prometo o mundo, mas posso começar roubando alguns sorrisos seus. ❤️</p>
-    <p class="credits" id="credits">Uma produção exclusiva, estrelando: eu mesmo. 🌹</p>
+    <p class="credits" id="credits">Uma produção exclusiva</p>
     <p class="joke" id="joke"><span class="stamp">CONFIDENCIAL</span><small>RELATÓRIO OFICIAL</small>Investimento em romantismo: acima da média. Resultado: ainda em avaliação.</p>
     <div class="final-btns" id="finalBtns">
       <button class="small-btn alt" id="rateBtn">Avaliar o galã ⭐</button>
@@ -805,7 +814,7 @@ $('#startBtn').addEventListener('click', async e => {
 });
 
 function enterChallenge() {
-  const items = challenge.querySelectorAll('.ch-title,.ch-sub,.plaque,.heart-area,.progress-box');
+  const items = challenge.querySelectorAll('.ch-title,.plaque,.heart-area,.progress-box');
   items.forEach((el, i) => el.animate([
     { opacity: 0, transform: 'translateY(-24px) scale(.94)' },
     { opacity: 1, transform: 'none' }
@@ -820,6 +829,22 @@ let clicks = 0, done = false, waiting = false, idleTimer = 0, ambientTimer = 0, 
 let idleCount = 0, fastShown = false, clickTimes = [], runId = 0;
 
 heartBtn.addEventListener('click', onHeart);
+// segurar Enter/Espaço não dispara cliques em sequência
+heartBtn.addEventListener('keydown', e => { if (e.repeat) e.preventDefault(); });
+heartBtn.addEventListener('contextmenu', e => e.preventDefault());
+
+/* ---- anti-bugs de clique rápido ----
+   iPhone/Safari ignora user-scalable=no, então bloqueamos os gestos diretamente. */
+['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+document.addEventListener('selectstart', e => e.preventDefault());
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  // 2º toque rápido fora de um botão = seria zoom de toque duplo em iOS antigos
+  if (now - lastTouchEnd < 350 && !e.target.closest('button,.clicky')) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
 
 function onHeart() {
   if (done || clicks >= TOTAL) return;           // nunca passa de 15
